@@ -1,0 +1,223 @@
+# MATRIX_CALCULATOR
+import math
+
+
+class MatrixProcessor:
+
+    def __init__(self):
+        while True:
+            choice = input('''1. Add matrices
+2. Multiply matrix by a constant
+3. Multiply matrices
+4. Transpose matrix
+5. Calculate a determinant
+6. Inverse matrix
+0. Exit
+Your choice: > ''')
+
+            if choice == '1':
+                self.addition()
+            elif choice == '2':
+                self.const_multi()
+            elif choice == '3':
+                self.multiply()
+            elif choice == '4':
+                self.transpose()
+            elif choice == '5':
+                self.det()
+            elif choice == '6':
+                self.inverse()
+            else:
+                break
+
+    def addition(self):
+
+        def user_input(which_matrix, r):
+            matrix = []
+            print(f"Enter {which_matrix} matrix:")
+            for y in range(r):
+                matrix.append([float(x) for x in input("> ").split()])
+            return matrix
+
+        row1, column1 = map(int, input("Enter size of first matrix: > ").split())
+        matrix1 = user_input('first', row1)
+
+        row2, column2 = map(int, input("Enter size of second matrix: > ").split())
+        matrix2 = user_input('second', row2)
+
+        if row1 == row2 and column1 == column2:
+            print("The result is:")
+            for row in range(row1):
+                for column in range(column1):
+                    result = matrix1[row][column] + matrix2[row][column]
+                    print(int(result) if result - round(result) == 0.0 else result, end=' ')
+                print('\n', end='')
+        else:
+            print("The operation cannot be performed.")
+        print()
+
+    def const_multi(self):
+        row, column = map(int, input("Enter size of matrix: > ").split())
+        print("Enter matrix:")
+        matrix = [[float(x) for x in input("> ").split()] for _ in range(row)]
+        const = float(input("Enter constant: > "))
+
+        print("The result is:")
+        for r in range(row):
+            for c in range(column):
+                print(matrix[r][c] * const, end=' ')
+            print('\n', end='')
+        print()
+
+    def multiply(self):
+
+        def user_input(which_matrix, r):
+            matrix = []
+            print(f"Enter {which_matrix} matrix:")
+            for y in range(r):
+                matrix.append([float(x) for x in input("> ").split()])
+            return matrix
+
+        row1, column1 = map(int, input("Enter size of first matrix: > ").split())
+        matrix1 = user_input('first', row1)
+
+        row2, column2 = map(int, input("Enter size of second matrix: > ").split())
+        matrix2 = user_input('second', row2)
+
+        if column1 == row2:
+            print("The result is:")
+            dot = 0
+            for row in range(row1):
+                for c2 in range(column2):
+                    for r2 in range(column1):
+                        dot += matrix1[row][r2] * matrix2[r2][c2]
+                    print(int(dot) if dot - round(dot) == 0.0 else dot, end=' ')
+                    dot -= dot
+                print('\n', end='')
+        else:
+            print("The operation cannot be performed.")
+        print()
+
+    def transpose(self):
+
+        def t1():
+            for c in range(column):
+                for r in range(row):
+                    elem = matrix[r][c]
+                    print(round(elem) if elem - round(elem) == 0.0 else elem, end=' ')
+                print('\n', end='')
+
+        def t2():
+            for c in range(column):
+                for r in range(row):
+                    elem = matrix[row - 1 - r][column - 1 - c]
+                    print(round(elem) if elem - round(elem) == 0.0 else elem, end=' ')
+                print('\n', end='')
+
+        def t3():
+            for r in range(row):
+                for c in range(column):
+                    elem = matrix[r][- c - 1]
+                    print(round(elem) if elem - round(elem) == 0.0 else elem, end=' ')
+                print('\n', end='')
+
+        def t4():
+            for r in range(row):
+                for c in range(column):
+                    elem = matrix[- r - 1][c]
+                    print(round(elem) if elem - round(elem) == 0.0 else elem, end=' ')
+                print('\n', end='')
+
+        t_type = input('''\n1. Main diagonal
+2. Side diagonal
+3. Vertical line
+4. Horizontal line
+Your choice: > ''')
+
+        row, column = map(int, input("Enter size of matrix: > ").split())
+        print("Enter matrix:")
+        matrix = [[float(x) for x in input("> ").split()] for _ in range(row)]
+        print('The result is:')
+
+        if t_type == '1':
+            t1()
+        elif t_type == '2':
+            t2()
+        elif t_type == '3':
+            t3()
+        else:
+            t4()
+        print()
+
+    def large_det(self, matrix, column, r=0):
+        cofactor = [[matrix[r_][c_] for c_ in range(column) if c_ != r] for r_ in range(column) if r_ != 0]
+
+        if len(cofactor) == 2:
+            if r == column - 1:
+                return matrix[0][r] * math.pow(-1, r) \
+                       * (cofactor[0][0] * cofactor[1][1] - cofactor[0][1] * cofactor[1][0])
+            return matrix[0][r] * math.pow(-1, r) \
+                   * (cofactor[0][0] * cofactor[1][1] - cofactor[0][1] * cofactor[1][0]) \
+                   + self.large_det(matrix, column, r + 1)
+
+        if r == column - 1:
+            return matrix[0][r] * math.pow(-1, r) * self.large_det(cofactor, len(cofactor))
+        return matrix[0][r] * math.pow(-1, r) \
+               * self.large_det(cofactor, len(cofactor)) \
+               + self.large_det(matrix, column, r + 1)
+
+    def det(self):
+        row, column = map(int, input("Enter matrix size: > ").split())
+        print("Enter matrix:")
+        matrix = [[float(x) for x in input("> ").split()] for _ in range(row)]
+        print('The result is:')
+
+        if len(matrix) == 1:
+            ans = matrix[0][0]
+            print(round(ans) if ans - round(ans) == 0.0 else ans)
+        elif len(matrix) == 2:
+            ans = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+            print(round(ans) if ans - round(ans) == 0.0 else ans)
+        else:
+            ans = self.large_det(matrix, column)
+            print(round(ans) if ans - round(ans) == 0.0 else ans)
+        print()
+
+    def det2(self, matrix, column):
+        if len(matrix) == 1:
+            ans = matrix[0][0]
+        elif len(matrix) == 2:
+            ans = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+        else:
+            ans = self.large_det(matrix, column)
+        return ans
+
+    def inverse(self):
+
+        def cof_trans(m, row, column):
+            minor = []
+            for r in range(row):
+                minor.append([])
+                for c in range(column):
+                    minor[r].append([[m[r_][c_] for c_ in range(row) if c_ != c] for r_ in range(column) if r_ != r])
+
+            cofactor = [[self.det2(minor[r][c], len(minor[r][c])) * math.pow(-1, r + c) for c in range(column)] for r in range(row)]
+            return [[cofactor[r][c] for r in range(row)] for c in range(column)]
+
+        row, column = map(int, input("Enter matrix size: > ").split())
+        print("Enter matrix:")
+        matrix = [[float(x) for x in input("> ").split()] for _ in range(row)]
+        print('The result is:')
+
+        if self.det2(matrix, column) != 0:
+            for r in range(row):
+                for c in range(column):
+                    ans = cof_trans(matrix, row, column)[r][c] / self.det2(matrix, column)
+                    print(round(ans) if ans - round(ans) == 0.0 else round(ans, 3), end=' ')
+                print('\n', end='')
+        else:
+            print("This matrix doesn't have an inverse.")
+        print()
+
+
+MatrixProcessor()
